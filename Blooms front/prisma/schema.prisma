@@ -1,24 +1,32 @@
+// ══════════════════════════════════════════════════════════
+// BLOOMS Junior School — LMS Database Schema
+// ══════════════════════════════════════════════════════════
+// DB: Supabase PostgreSQL
+// url       → pgBouncer pooler (port 6543) used at runtime
+// directUrl → session connection (port 5432) used for migrations
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  password      String   @default("Blooms@2025")
-  role          String   @default("parent")
-  otp           String?
-  otpExpiry     DateTime?
-  isVerified    Boolean  @default(false)
-  linkedParentId String? @unique
-  linkedTeacherId String? @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String    @default("Blooms@2025")
+  role            String    @default("parent")
+  otp             String?
+  otpExpiry       DateTime?
+  isVerified      Boolean   @default(false)
+  linkedParentId  String?   @unique
+  linkedTeacherId String?   @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   linkedParent  Parent?  @relation(fields: [linkedParentId], references: [id])
   linkedTeacher Teacher? @relation(fields: [linkedTeacherId], references: [id])
@@ -48,88 +56,88 @@ model Student {
   fees            Fee[]
   feePayments     FeePayment[]
   receipts        Receipt[]
-  parent          Parent?  @relation(fields: [parentId], references: [id])
+  parent          Parent?          @relation(fields: [parentId], references: [id])
   parentId        String?
   schoolWorkViews SchoolWorkView[]
 }
 
 model Parent {
-  id              String    @id @default(cuid())
-  name            String
-  email           String    @unique
-  phone           String
-  occupation      String?
-  address         String?
-  starRating      Int       @default(0)
-  starTier        String    @default("Bronze")
-  participation   String    @default("")
-  children        Student[]
-  user            User?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  phone         String
+  occupation    String?
+  address       String?
+  starRating    Int       @default(0)
+  starTier      String    @default("Bronze")
+  participation String    @default("")
+  children      Student[]
+  user          User?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Teacher {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   firstName     String
   lastName      String
-  email         String   @unique
+  email         String    @unique
   phone         String
   subject       String
   qualification String?
-  status        String   @default("Active")
+  status        String    @default("Active")
   profileImage  String?
-  appliedAt     DateTime @default(now())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  appliedAt     DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  user          User?
-  payslips      Payslip[]
-  conducts      TeacherConduct[]
-  contracts     EmploymentContract[]
-  schemes       SchemeOfWork[]
-  schoolWork    SchoolWork[]
+  user       User?
+  payslips   Payslip[]
+  conducts   TeacherConduct[]
+  contracts  EmploymentContract[]
+  schemes    SchemeOfWork[]
+  schoolWork SchoolWork[]
 }
 
 model Fee {
-  id          String   @id @default(cuid())
-  studentId   String
-  student     Student  @relation(fields: [studentId], references: [id])
-  term        String
-  amount      Float
-  paid        Float    @default(0)
-  status      String   @default("Pending")
-  dueDate     String?
-  paidDate    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  term      String
+  amount    Float
+  paid      Float    @default(0)
+  status    String   @default("Pending")
+  dueDate   String?
+  paidDate  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model FeePayment {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   studentId     String
   studentName   String?
   feeId         String?
-  student       Student  @relation(fields: [studentId], references: [id])
+  student       Student   @relation(fields: [studentId], references: [id])
   amount        Float
-  paymentMethod String   @default("M-Pesa")
+  paymentMethod String    @default("M-Pesa")
   referenceNo   String
   slipUrl       String?
   verifiedBy    String?
   verifiedAt    DateTime?
-  status        String   @default("Pending")
+  status        String    @default("Pending")
   term          String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
 }
 
 model FeeReminder {
-  id          String   @id @default(cuid())
-  studentId   String?
-  parentId     String?
-  message     String
-  sentBy      String
-  status      String   @default("Sent")
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  studentId String?
+  parentId  String?
+  message   String
+  sentBy    String
+  status    String   @default("Sent")
+  createdAt DateTime @default(now())
 }
 
 model Receipt {
@@ -162,40 +170,40 @@ model Payslip {
 }
 
 model TeacherConduct {
-  id          String   @id @default(cuid())
-  teacherId   String
-  teacher     Teacher  @relation(fields: [teacherId], references: [id])
-  rating      String   @default("Good")
-  comments    String
-  loggedBy    String
-  period      String
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  teacherId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  rating    String   @default("Good")
+  comments  String
+  loggedBy  String
+  period    String
+  createdAt DateTime @default(now())
 }
 
 model EmploymentContract {
-  id          String   @id @default(cuid())
-  teacherId   String
-  teacher     Teacher  @relation(fields: [teacherId], references: [id])
-  contractNo  String
-  startDate   String
-  endDate     String?
-  salary      Float
-  position    String
-  fileUrl     String?
-  status      String   @default("Active")
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  teacherId  String
+  teacher    Teacher  @relation(fields: [teacherId], references: [id])
+  contractNo String
+  startDate  String
+  endDate    String?
+  salary     Float
+  position   String
+  fileUrl    String?
+  status     String   @default("Active")
+  createdAt  DateTime @default(now())
 }
 
 model SchemeOfWork {
-  id          String   @id @default(cuid())
-  teacherId   String
-  teacher     Teacher  @relation(fields: [teacherId], references: [id])
-  title       String
-  subject     String
-  grade       String
-  term        String
-  fileUrl     String
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  teacherId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  title     String
+  subject   String
+  grade     String
+  term      String
+  fileUrl   String
+  createdAt DateTime @default(now())
 }
 
 model Application {
@@ -223,17 +231,17 @@ model SchoolWork {
   type        String   @default("Homework")
   createdAt   DateTime @default(now())
 
-  views       SchoolWorkView[]
+  views SchoolWorkView[]
 }
 
 model SchoolWorkView {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   schoolWorkId String
   schoolWork   SchoolWork @relation(fields: [schoolWorkId], references: [id])
   studentId    String
-  student      Student  @relation(fields: [studentId], references: [id])
-  action       String   @default("viewed")
-  createdAt    DateTime @default(now())
+  student      Student    @relation(fields: [studentId], references: [id])
+  action       String     @default("viewed")
+  createdAt    DateTime   @default(now())
 }
 
 model Announcement {
@@ -277,11 +285,11 @@ model Notification {
 model Message {
   id          String   @id @default(cuid())
   sender      String
-  senderRole  String  @default("parent")
-  senderEmail String  @default("")
+  senderRole  String   @default("parent")
+  senderEmail String   @default("")
   subject     String
   content     String
-  read        Boolean @default(false)
-  archived    Boolean @default(false)
+  read        Boolean  @default(false)
+  archived    Boolean  @default(false)
   createdAt   DateTime @default(now())
 }

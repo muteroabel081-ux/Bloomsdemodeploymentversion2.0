@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaLibSQL } from "@prisma/adapter-libsql";
 
 // ══════════════════════════════════════════════════════════
 // Prisma client singleton, wired for Turso (libSQL).
@@ -21,13 +20,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function makePrismaClient() {
-  const adapter = new PrismaLibSQL({
-    url: process.env.DATABASE_URL ?? "file:./db/custom.db",
-    authToken: process.env.DATABASE_AUTH_TOKEN, // required for Turso, unused for local file DB
-  });
-
   return new PrismaClient({
-    adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 }
